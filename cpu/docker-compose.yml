@@ -1,0 +1,60 @@
+version: "3.9"
+services:
+
+  safrdb:
+    image: "postgres:14.1"
+    container_name: safrdb
+    network_mode: bridge
+    restart: always
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=safr
+    ports:
+      - "5433:5432"
+    volumes:
+      - safr-db:/var/lib/postgresql/data
+
+  proc:
+    image: paravision/processor:v5-zill-v2-openvino
+    container_name: processor-api
+    environment:
+      - HTTP_PROXY=on
+      - INFERENCE_WORKERS=8
+    network_mode: bridge
+    restart: always
+    ports:
+      - "50051:50051"
+      - "8081:8081"
+  ident:
+    image: "paravision/identity:v4.0.0"
+    container_name: identity-api 
+    environment:
+      - POSTGRES_URI=postgres://admin:admin@pvdb2:5432/identity?sslmode=disable
+      - HTTP_PROXY=on
+    network_mode: bridge
+    restart: always
+    ports:
+      - "5656:5656"
+      - "8080:8080"
+    depends_on:
+      - pvdb2
+    links:
+      - pvdb2
+  pvdb2:
+    image: "paravision/postgres:12.0"
+    container_name: pvdb2
+    network_mode: bridge
+    restart: always
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=identity
+    ports:
+      - "5432:5432"
+    volumes:
+      - pv-data2:/var/lib/postgresql/data
+
+volumes:
+  pv-data2:
+  safr-db:
