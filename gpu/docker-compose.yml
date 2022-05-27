@@ -9,7 +9,7 @@ services:
             - POSTGRES_PASSWORD=admin
             - POSTGRES_DB=safr
         ports:
-            - "5433:5432"
+            - "${SAFR_DB_PORT}:5432"
             #- "80:5432"
         volumes:
             - safr-db:/var/lib/postgresql/data
@@ -19,16 +19,16 @@ services:
         container_name: safr-api
         restart: always
         ports:
-           - "80:3030"
+           - "${SAFR_API_HTTP_PORT}:3030"
         environment:
-            - SAFR_DB_ADDR=192.168.0.101
+            - SAFR_DB_ADDR=${BASE_IP}
             - SAFR_DB_PORT=5433
-            - VID_STREAM_ADDR=192.168.0.101:5000
-            - DETECT_ADDR=192.168.0.101:5050
-            - ALERTS_ADDR=192.168.0.101:5051
-            - IDENT_API=http://192.168.0.101:8080/v4/
-            - PROC_API=http://192.168.0.101:8081/v6/
-            - FR_API=192.168.0.101:80
+            - VID_STREAM_ADDR=${BASE_IP}:5000
+            - DETECT_ADDR=${BASE_IP}:5050
+            - ALERTS_ADDR=${BASE_IP}:5051
+            - IDENT_API=http://${BASE_IP}:8080/v4/
+            - PROC_API=http://${BASE_IP}:8081/v6/
+            - FR_API=${BASE_IP}:80
             - TPASS_USER=admin
             - TPASS_PWD=njbs1968
             - TPASS_ADDR=https://devsys01.tpassvms.com/TPassPVService/
@@ -46,12 +46,12 @@ services:
         ports:
            - "3031:80"
         environment:
-            - SAFR_DB_ADDR=192.168.0.101
+            - SAFR_DB_ADDR=${BASE_IP}
             - SAFR_DB_PORT=5433
-            - VID_STREAM_ADDR=192.168.0.101:5000
-            - DETECT_ADDR=192.168.0.101:5050
-            - ALERTS_ADDR=192.168.0.101:5051
-            - FR_API=192.168.0.101:80
+            - VID_STREAM_ADDR=${BASE_IP}:5000
+            - DETECT_ADDR=${BASE_IP}:5050
+            - ALERTS_ADDR=${BASE_IP}:5051
+            - FR_API=${BASE_IP}:80
             - MIN_MATCH=0.50
             - MATCH_EXPIRES=10
             - MIN_QUALITY=0.8
@@ -109,7 +109,7 @@ services:
                     devices:
                       - capabilities: [gpu]
         environment:
-            - TZ=America/New_York
+            - TZ=${TZ}
             - PV_INFERENCE_WORKERS=1
             - PV_POSTPROCESSOR_WORKERS=1
             - PV_OUTPUT_FACES_ONLY=True
