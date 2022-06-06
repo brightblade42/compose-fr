@@ -36,6 +36,10 @@ services:
             - MATCH_EXPIRES=10
             - MIN_QUALITY=0.8
             - MIN_DUPE_MATCH=0.98
+            - TZ=America/New_York
+        volumes:
+            - /etc/timezone:/etc/timezone:ro
+            - /etc/localtime:/etc/localtime:ro
 
 
     safr-cams:
@@ -45,6 +49,7 @@ services:
         restart: always
         ports:
            - "3031:80"
+           - "443:443"
         environment:
             - SAFR_DB_ADDR=${BASE_IP}
             - SAFR_DB_PORT=5433
@@ -55,6 +60,16 @@ services:
             - MIN_MATCH=0.50
             - MATCH_EXPIRES=10
             - MIN_QUALITY=0.8
+            - ASPNETCORE_URLS=https://+443;http://+80
+            - ASPNETCORE_HTTPS_PORT=443
+            - ASPNETCORE_Kestrel__Certificates__Default__Password=eyemetric
+            - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/EyemetricFR.Server.pfx
+            - TZ=America/New_York
+        volumes:
+            - /home/ryan/.aspnet/https:/https
+            - /etc/timezone:/etc/timezone:ro
+            - /etc/localtime:/etc/localtime:ro
+
     proc:
         image: "paravision/processor:v6-gen5-balanced-tensorrt"
         container_name: proc-v6
