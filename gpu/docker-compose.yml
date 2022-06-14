@@ -8,11 +8,14 @@ services:
             - POSTGRES_USER=admin
             - POSTGRES_PASSWORD=admin
             - POSTGRES_DB=safr
+            - TZ=America/New_York
         ports:
             - "${SAFR_DB_PORT}:5432"
             #- "80:5432"
         volumes:
             - safr-db:/var/lib/postgresql/data
+            - /etc/timezone:/etc/timezone:ro
+            - /etc/localtime:/etc/localtime:ro
 
     safr-api:
         image: eyemetricfr/safr:v0.91
@@ -20,6 +23,7 @@ services:
         restart: always
         ports:
            - "${SAFR_API_HTTP_PORT}:3030"
+           - "${SAFR_API_HTTPS_PORT}:443"
         environment:
             - SAFR_DB_ADDR=${BASE_IP}
             - SAFR_DB_PORT=5433
@@ -28,7 +32,7 @@ services:
             - ALERTS_ADDR=${BASE_IP}:5051
             - IDENT_API=http://${BASE_IP}:8080/v4/
             - PROC_API=http://${BASE_IP}:8081/v6/
-            - FR_API=${BASE_IP}:80
+            - FR_API=${BASE_IP}:443
             - TPASS_USER=admin
             - TPASS_PWD=njbs1968
             - TPASS_ADDR=https://devsys01.tpassvms.com/TPassPVService/
@@ -40,7 +44,7 @@ services:
         volumes:
             - /etc/timezone:/etc/timezone:ro
             - /etc/localtime:/etc/localtime:ro
-
+            - "${CERT_DIR}:/cert"
 
     safr-cams:
         #image: eyemetricfr/safr-cams:v0.91
@@ -49,17 +53,18 @@ services:
         restart: always
         ports:
            - "3031:80"
-           - "443:443"
+           - "3032:443"
         environment:
             - SAFR_DB_ADDR=${BASE_IP}
             - SAFR_DB_PORT=5433
             - VID_STREAM_ADDR=${BASE_IP}:5000
             - DETECT_ADDR=${BASE_IP}:5050
             - ALERTS_ADDR=${BASE_IP}:5051
-            - FR_API=${BASE_IP}:80
+            - FR_API=https://${BASE_IP}
             - MIN_MATCH=0.50
             - MATCH_EXPIRES=10
             - MIN_QUALITY=0.8
+            - CONSOLE_LOOKUP=${CONSOLE_LOOKUP}
             - ASPNETCORE_URLS=https://+443;http://+80
             - ASPNETCORE_HTTPS_PORT=443
             - ASPNETCORE_Kestrel__Certificates__Default__Password=eyemetric
