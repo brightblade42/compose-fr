@@ -8,7 +8,7 @@ services:
             - POSTGRES_USER=admin
             - POSTGRES_PASSWORD=admin
             - POSTGRES_DB=safr
-            - TZ=America/New_York
+            - TZ=${TZ}
         ports:
             - "${SAFR_DB_PORT}:5432"
             #- "80:5432"
@@ -18,7 +18,7 @@ services:
             - /etc/localtime:/etc/localtime:ro
 
     safr-api:
-        image: eyemetricfr/safr:v0.91
+        image: eyemetricfr/safr:v0.92
         container_name: safr-api
         restart: always
         ports:
@@ -40,15 +40,15 @@ services:
             - MATCH_EXPIRES=10
             - MIN_QUALITY=0.8
             - MIN_DUPE_MATCH=0.98
-            - TZ=America/New_York
+            - RUST_LOG=${RUST_LOG}
+            - TZ=${TZ}
         volumes:
             - /etc/timezone:/etc/timezone:ro
             - /etc/localtime:/etc/localtime:ro
             - "${CERT_DIR}:/cert"
 
     safr-cams:
-        #image: eyemetricfr/safr-cams:v0.91
-        image: eyemetricfr/safr-cams:v0.91d
+        image: eyemetricfr/safr-cams:v0.92
         container_name: safr-cams
         restart: always
         ports:
@@ -69,7 +69,7 @@ services:
             - ASPNETCORE_HTTPS_PORT=443
             - ASPNETCORE_Kestrel__Certificates__Default__Password=eyemetric
             - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/EyemetricFR.Server.pfx
-            - TZ=America/New_York
+            - TZ=${TZ}
         volumes:
             - /home/ryan/.aspnet/https:/https
             - /etc/timezone:/etc/timezone:ro
